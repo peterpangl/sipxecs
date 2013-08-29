@@ -16,8 +16,8 @@ BuildRequires: automake
 # libxml2 is for xml validation in 'make check'
 BuildRequires: libxml2
 
-Requires: mongodb >= 2.2
 Requires: sipxsupervisor >= %version
+Requires: mongodb >= 2.2
 Requires: pymongo
 Requires: python-argparse
 Requires: js
