@@ -556,7 +556,13 @@ public class ValidUsers {
 
         user.setUserBusyPrompt(Boolean.valueOf(getStringValue(obj, USERBUSYPROMPT)));
         user.setMoh(getStringValue(obj, MOH));
-        user.setHighestWeightGroup(getStringValue(obj, MOH));
+        
+        // highest weight group is always the last in the list
+        BasicDBList groups = (BasicDBList) obj.get(GROUPS);
+        if (groups != null) {
+        	user.setHighestWeightGroup((String) groups.get(groups.size() - 1));
+        }
+        
         user.setVoicemailTui(getStringValue(obj, VOICEMAILTUI));
         user.setEmailAddress(getStringValue(obj, EMAIL));
         if (obj.keySet().contains(NOTIFICATION)) {
