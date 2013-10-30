@@ -98,6 +98,7 @@
     <fieldset jwcid="@setting/SettingsFieldset"
       settings="ognl:mohSettings"
       renderGroupTitle="ognl:false"/>
+    <span jwcid="@moh/GroupMusicOnHoldComponent" group="ognl:group" callback="ognl:callback"/>
     <ul jwcid="@common/FormActions" listener="listener:apply" callback="ognl:callback">
       <li><input jwcid="mohUpdatePhones@Submit"
             listener="listener:onMohUpdatePhones"

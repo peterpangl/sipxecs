@@ -287,7 +287,7 @@ public class ValidUsers {
         user.setConfNum(getStringValue(conference, CONF_EXT));
         user.setConfPin(getStringValue(conference, CONF_PIN));
     }
-
+    
     /**
      * Given a bunch of DTMF digits, return the list of users that matches
      *
@@ -556,6 +556,7 @@ public class ValidUsers {
 
         user.setUserBusyPrompt(Boolean.valueOf(getStringValue(obj, USERBUSYPROMPT)));
         user.setMoh(getStringValue(obj, MOH));
+        user.setHighestWeightGroup(getStringValue(obj, MOH));
         user.setVoicemailTui(getStringValue(obj, VOICEMAILTUI));
         user.setEmailAddress(getStringValue(obj, EMAIL));
         if (obj.keySet().contains(NOTIFICATION)) {
@@ -691,6 +692,15 @@ public class ValidUsers {
     }
 
     private static String getStringValue(DBObject obj, String key) {
+        if (obj.keySet().contains(key)) {
+            if (obj.get(key) != null) {
+                return obj.get(key).toString();
+            }
+        }
+        return null;
+    }
+    
+    private static String getFirstValueFromCursor(DBObject obj, String key) {
         if (obj.keySet().contains(key)) {
             if (obj.get(key) != null) {
                 return obj.get(key).toString();
