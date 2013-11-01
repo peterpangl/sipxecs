@@ -52,7 +52,7 @@ public abstract class AbstractMusicOnHoldComponent extends BaseComponent {
     @InjectObject(value = "spring:configManager")
     public abstract ConfigManager getConfigManager();
 
-    @Persist
+    @Persist(value = "client")
     public abstract String getAsset();
 
     public abstract String getAudioDirectory();

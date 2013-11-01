@@ -40,7 +40,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
-import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
 /**
@@ -706,15 +705,6 @@ public class ValidUsers {
         return null;
     }
     
-    private static String getFirstValueFromCursor(DBObject obj, String key) {
-        if (obj.keySet().contains(key)) {
-            if (obj.get(key) != null) {
-                return obj.get(key).toString();
-            }
-        }
-        return null;
-    }
-
     /**
      * Remove all non-letter characters, convert to upper case Remove diacritical marks if
      * possible
