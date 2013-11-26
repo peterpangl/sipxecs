@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -21,7 +22,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Holds the configuration data needed for the AutoAttendant.
- * 
+ *
  */
 public class Configuration {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
@@ -32,7 +33,7 @@ public class Configuration {
 
     private Vector<AttendantConfig> m_attendants;
     private Vector<Schedule> m_schedules;
-    
+
     public Schedule getSchedule(String id) {
         if (m_schedules == null || id == null) {
             return null;
@@ -62,7 +63,7 @@ public class Configuration {
     /**
      * Load new Configuration object if the underlying properties files have changed since the
      * last time.
-     * 
+     *
      * @return
      */
     public void update() {
@@ -73,32 +74,33 @@ public class Configuration {
 
     /**
      * Returns the id of the Special Autoattendant, or null if there is none specified.
+     *
      * @return
      */
     public String getSpecialAttendantId() {
         return m_specialId;
     }
-    
+
     /**
      * Load the autoattendants.xml file
      */
     void loadXML() {
-    	LOG.info("Configuration::loadXML Loading autoattendants.xml configuration");
+        LOG.info("Configuration::loadXML Loading autoattendants.xml configuration");
         String path = System.getProperty("conf.dir");
         if (path == null) {
-            LOG.fatal("Cannot get System Property conf.dir!  Check jvm argument -Dconf.dir=") ;
+            LOG.fatal("Cannot get System Property conf.dir!  Check jvm argument -Dconf.dir=");
             System.exit(1);
         }
-        
+
         Document autoAttendantsDoc = null;
-        
+
         try {
             s_configFile = new File(path + "/autoattendants.xml");
             s_lastModified = s_configFile.lastModified();
 
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             autoAttendantsDoc = builder.parse(s_configFile);
-            
+
         } catch (Throwable t) {
             LOG.fatal("Configuration::loadXML Something went wrong loading the autoattendants.xml file.", t);
             return;
@@ -114,14 +116,14 @@ public class Configuration {
             NodeList autoattendants = autoAttendantsDoc.getElementsByTagName(prop = "autoattendant");
             for (int aaNum = 0; aaNum < autoattendants.getLength(); aaNum++) {
                 Node attendantNode = autoattendants.item(aaNum);
-                AttendantConfig c = new AttendantConfig() ;
+                AttendantConfig c = new AttendantConfig();
                 String id = attendantNode.getAttributes().getNamedItem("id").getNodeValue();
                 Node specialNode = attendantNode.getAttributes().getNamedItem("special");
                 if (specialNode != null && Boolean.parseBoolean(specialNode.getNodeValue())) {
                     m_specialId = id;
                 }
                 c.setId(id);
-                for(Node next = attendantNode.getFirstChild(); next != null; next = next.getNextSibling()) {
+                for (Node next = attendantNode.getFirstChild(); next != null; next = next.getNextSibling()) {
                     if (next.getNodeType() == Node.ELEMENT_NODE) {
                         String name = next.getNodeName();
                         if (name.equals(prop = "name")) {
@@ -129,35 +131,54 @@ public class Configuration {
                         } else if (name.equals(prop = "prompt")) {
                             c.setPrompt(next.getTextContent().trim());
                         } else if (name.equals(prop = "menuItems")) {
-                            parseMenuItems(next, c) ;
+                            parseMenuItems(next, c);
                         } else if (name.equals(prop = "dtmf")) {
-                            parseDtmf(next, c) ;
-                        }  else if (name.equals(prop = "invalidResponse")) {
-                            parseInvalidResponse(next, c) ;
+                            parseDtmf(next, c);
+                        } else if (name.equals(prop = "invalidResponse")) {
+                            parseInvalidResponse(next, c);
+                        } else if (name.equals(prop = "liveAttendant")) {
+                            parseLiveAttendant(next, c);
                         }
                     }
                 }
                 m_attendants.add(c);
             }
 
-            // Walk schedule elements 
+            // Walk schedule elements
             m_schedules = new Vector<Schedule>();
             NodeList schedules = autoAttendantsDoc.getElementsByTagName(prop = "schedule");
             for (int schedNum = 0; schedNum < schedules.getLength(); schedNum++) {
-            	Node scheduleNode = schedules.item(schedNum);
-            	Schedule s = new Schedule();
-            	s.loadSchedule(scheduleNode) ;
-            	m_schedules.add(s) ;
+                Node scheduleNode = schedules.item(schedNum);
+                Schedule s = new Schedule();
+                s.loadSchedule(scheduleNode);
+                m_schedules.add(s);
             }
 
         } catch (Exception e) {
-            LOG.fatal("Configuration::loadXML Problem understanding document "+prop, e);
+            LOG.fatal("Configuration::loadXML Problem understanding document " + prop, e);
             System.exit(1);
         }
     }
 
+    private void parseLiveAttendant(Node menuItemNode, AttendantConfig c) {
+        for (Node next = menuItemNode.getFirstChild(); next != null; next = next.getNextSibling()) {
+            if (next.getNodeType() == Node.ELEMENT_NODE) {
+                c.setLiveAttendant(true);
+                String name = next.getNodeName();
+                if (name.equals("ringFor")) {
+                    c.setRingFor(Integer.parseInt(next.getTextContent().trim()));
+                } else if (name.equals("transfer-extension")) {
+                    c.setLiveTransferUrl(next.getTextContent().trim());
+                } else if (name.equals("followUserFwd")) {
+                    c.setFollowUserFwd(BooleanUtils.toBoolean(next.getTextContent().trim(), "1", "0"));
+                }
+            }
+        }
+
+    }
+
     void parseMenuItems(Node menuItemsNode, AttendantConfig c) {
-        for(Node next = menuItemsNode.getFirstChild(); next != null; next = next.getNextSibling()) {
+        for (Node next = menuItemsNode.getFirstChild(); next != null; next = next.getNextSibling()) {
             if (next.getNodeType() == Node.ELEMENT_NODE) {
                 if (next.getNodeName().equals("menuItem")) {
                     parseMenuItem(next, c);
@@ -165,9 +186,9 @@ public class Configuration {
             }
         }
     }
-    
+
     void parseInvalidResponse(Node menuItemNode, AttendantConfig c) {
-        for(Node next = menuItemNode.getFirstChild(); next != null; next = next.getNextSibling()) {
+        for (Node next = menuItemNode.getFirstChild(); next != null; next = next.getNextSibling()) {
             if (next.getNodeType() == Node.ELEMENT_NODE) {
                 String name = next.getNodeName();
                 if (name.equals("noInputCount")) {
@@ -186,7 +207,7 @@ public class Configuration {
     }
 
     void parseDtmf(Node dtmfNode, AttendantConfig c) {
-        for(Node next = dtmfNode.getFirstChild(); next != null; next = next.getNextSibling()) {
+        for (Node next = dtmfNode.getFirstChild(); next != null; next = next.getNextSibling()) {
             if (next.getNodeType() == Node.ELEMENT_NODE) {
                 String name = next.getNodeName();
                 if (name.equals("interDigitTimeout")) {
@@ -221,9 +242,9 @@ public class Configuration {
         String dialPad = "";
         String action = "";
         String extension = "";
-        String parameter = "" ;
-        
-        for(Node next = menuItemNode.getFirstChild(); next != null; next = next.getNextSibling()) {
+        String parameter = "";
+
+        for (Node next = menuItemNode.getFirstChild(); next != null; next = next.getNextSibling()) {
             if (next.getNodeType() == Node.ELEMENT_NODE) {
                 String name = next.getNodeName();
                 if (name.equals("dialPad")) {
@@ -239,7 +260,5 @@ public class Configuration {
         }
         c.addMenuItem(new AttendantMenuItem(dialPad, Actions.valueOf(action), parameter, extension));
     }
-    
- 
 
 }

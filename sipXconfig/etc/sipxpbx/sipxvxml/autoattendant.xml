@@ -56,4 +56,30 @@
       <value />
     </setting>
   </group>
+  <group name="live-attendant">
+    <setting name="enable">
+      <type>
+        <boolean />
+      </type>
+      <value>0</value>
+    </setting>
+    <setting name="ringFor">
+      <type>
+        <integer min="0" max="30"/>
+      </type>
+      <value>5</value>
+    </setting>
+    <setting name="followUserFwd">
+      <type>
+        <boolean />
+      </type>
+      <value>1</value>
+    </setting>
+    <setting name="transfer-extension">
+      <type>
+        <string />
+      </type>
+      <value />
+    </setting>
+  </group>
 </model>

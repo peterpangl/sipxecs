@@ -43,6 +43,10 @@ public class AutoAttendant extends BeanWithGroups implements NamedObject, Deploy
     public static final String ONFAIL_TRANSFER = "onfail/transfer";
     public static final String ONFAIL_TRANSFER_EXT = "onfail/transfer-extension";
     public static final String ONFAIL_TRANSFER_PROMPT = "onfail/transfer-prompt";
+    public static final String LIVE_ATTENDANT_ENABLE = "live-attendant/enable";
+    public static final String LIVE_ATTENDANT_RING_FOR = "live-attendant/ringFor";
+    public static final String LIVE_ATTENDANT_FOLLOW_FWD = "live-attendant/followUserFwd";
+    public static final String LIVE_ATTENDANT_TRANSFER_EXT = "live-attendant/transfer-extension";
 
     private static final String SYSTEM_NAME_PREFIX = "xcf";
     private String m_name;
@@ -120,10 +124,12 @@ public class AutoAttendant extends BeanWithGroups implements NamedObject, Deploy
         m_prompt = prompt;
     }
 
+    @Override
     public String getName() {
         return m_name;
     }
 
+    @Override
     public void setName(String name) {
         m_name = name;
     }
@@ -152,6 +158,10 @@ public class AutoAttendant extends BeanWithGroups implements NamedObject, Deploy
 
     public File getPromptFile() {
         return new File(m_promptsDirectory, m_prompt);
+    }
+
+    public boolean isLiveAttendant() {
+        return (Boolean) getSettingTypedValue(LIVE_ATTENDANT_ENABLE);
     }
 
     /**
@@ -221,6 +231,10 @@ public class AutoAttendant extends BeanWithGroups implements NamedObject, Deploy
         attendant.setSettingValue(ONFAIL_TRANSFER, getSettingValue(ONFAIL_TRANSFER));
         attendant.setSettingValue(ONFAIL_TRANSFER_EXT, getSettingValue(ONFAIL_TRANSFER_EXT));
         attendant.setSettingValue(ONFAIL_TRANSFER_PROMPT, getSettingValue(ONFAIL_TRANSFER_PROMPT));
+        attendant.setSettingValue(LIVE_ATTENDANT_ENABLE, getSettingValue(LIVE_ATTENDANT_ENABLE));
+        attendant.setSettingValue(LIVE_ATTENDANT_RING_FOR, getSettingValue(LIVE_ATTENDANT_RING_FOR));
+        attendant.setSettingValue(LIVE_ATTENDANT_TRANSFER_EXT, getSettingValue(LIVE_ATTENDANT_TRANSFER_EXT));
+        attendant.setSettingValue(LIVE_ATTENDANT_FOLLOW_FWD, getSettingValue(LIVE_ATTENDANT_FOLLOW_FWD));
         attendant.setGroupsAsList(getGroupsAsList());
     }
 

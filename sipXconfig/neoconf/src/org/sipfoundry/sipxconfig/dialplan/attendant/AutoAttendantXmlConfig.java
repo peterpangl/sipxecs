@@ -151,6 +151,13 @@ public class AutoAttendantXmlConfig {
                 irEl.addElement("transferPrompt").setText(fullPathTransferPromptFile.getPath());
             }
         }
+        // LIVE ATT
+        if (autoAttendant.isLiveAttendant()) {
+            Element liveAtt = aaEl.addElement("liveAttendant");
+            addSettingValue(liveAtt, "ringFor", autoAttendant, "live-attendant/ringFor");
+            addSettingValue(liveAtt, "followUserFwd", autoAttendant, "live-attendant/followUserFwd");
+            addSettingValue(liveAtt, "transfer-extension", autoAttendant, "live-attendant/transfer-extension");
+        }
     }
 
     /**

@@ -38,9 +38,9 @@ public class Attendant extends SipxIvrApp {
      * Run each Attendant until there is nothing left to do. If the SIP URL didn't pass in a
      * particular attendant name, use the current time of day and the schedule to find which
      * attendant to run.
-     * 
+     *
      * Keep running the next returned attendant until there are none left, then exit.
-     * 
+     *
      * @throws Throwable indicating an error or hangup condition.
      */
     @Override
@@ -86,7 +86,7 @@ public class Attendant extends SipxIvrApp {
 
     /**
      * Do the specified Attendant.
-     * 
+     *
      * @param id The id of the attendant.
      * @return The id of the next attendant, or null if there is no next.
      */
@@ -112,6 +112,15 @@ public class Attendant extends SipxIvrApp {
             // Check for a failure condition
             if (invalidCount > config.getInvalidResponseCount() || timeoutCount > config.getNoInputCount()) {
                 failure(config, controller);
+                break;
+            }
+
+            // check for live attendant and do the needful
+            if (config.isLiveAttendant()) {
+                User user = m_validUsers.getUser(config.getLiveTransferUrl());
+                String liveUri = getLiveUri( user.getUri(), config);
+                LOG.info("Live attendant. Transfering to " + liveUri);
+                controller.transfer(liveUri, true);
                 break;
             }
 
@@ -192,7 +201,7 @@ public class Attendant extends SipxIvrApp {
 
     /**
      * Do the action from the corresponding menu item.
-     * 
+     *
      * @param item
      * @return The next action to perform
      */
@@ -287,7 +296,7 @@ public class Attendant extends SipxIvrApp {
     /**
      * Perform the configured "failure" behavior, which can be either just hangup or transfer to a
      * destination after playing a prompt.
-     * 
+     *
      */
     void failure(AttendantConfig config, AaEslRequestController controller) {
         LOG.info("Attendant::failure");
@@ -331,6 +340,19 @@ public class Attendant extends SipxIvrApp {
 
         // This is an enhancement over the original VoiceXML
         controller.goodbye(playGoodbye);
+    }
+
+    /**
+     * formats the transfer URI for the live attendant based on the live attendant config
+     * @return
+     */
+    private String getLiveUri(String userUri, AttendantConfig config) {
+        StringBuffer uri = new StringBuffer(userUri);
+        if (!config.isFollowUserFwd()) {
+            uri.append(";sipx-userforward=false");
+        }
+
+        return uri.toString();
     }
 
     public void setValidUsers(ValidUsers validUsers) {

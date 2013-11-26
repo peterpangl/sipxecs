@@ -25,7 +25,11 @@ public class AttendantConfig extends ApplicationConfiguraton {
     private String m_id; // The ID of this attendant
     private String m_name; // The name of this attendant
     private String m_prompt; // The top level prompt
-    private List<AttendantMenuItem> m_menuItems = new LinkedList<AttendantMenuItem>();;
+    private boolean m_liveAttendant;
+    private int m_ringFor;
+    private String m_liveTransferUrl;
+    private boolean m_followUserFwd;
+    private final List<AttendantMenuItem> m_menuItems = new LinkedList<AttendantMenuItem>();;
 
     public AttendantConfig() {
         super();
@@ -62,5 +66,43 @@ public class AttendantConfig extends ApplicationConfiguraton {
     public List<AttendantMenuItem> getMenuItems() {
         return m_menuItems;
     }
+
+    public void setRingFor() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public int getRingFor() {
+        return m_ringFor;
+    }
+
+    public void setRingFor(int ringFor) {
+        m_ringFor = ringFor;
+    }
+
+    public String getLiveTransferUrl() {
+        return m_liveTransferUrl;
+    }
+
+    public void setLiveTransferUrl(String liveTransferUrl) {
+        m_liveTransferUrl = liveTransferUrl;
+    }
+
+    public boolean isFollowUserFwd() {
+        return m_followUserFwd;
+    }
+
+    public void setFollowUserFwd(boolean followUserFwd) {
+        m_followUserFwd = followUserFwd;
+    }
+
+    public boolean isLiveAttendant() {
+        return m_liveAttendant;
+    }
+
+    public void setLiveAttendant(boolean liveAttendant) {
+        m_liveAttendant = liveAttendant;
+    }
+
 
 }
