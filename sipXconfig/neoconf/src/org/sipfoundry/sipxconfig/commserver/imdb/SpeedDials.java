@@ -16,11 +16,15 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
+import static org.sipfoundry.commons.mongo.MongoConstants.BUTTONS;
+import static org.sipfoundry.commons.mongo.MongoConstants.NAME;
+import static org.sipfoundry.commons.mongo.MongoConstants.SPEEDDIAL;
+import static org.sipfoundry.commons.mongo.MongoConstants.URI;
+import static org.sipfoundry.commons.mongo.MongoConstants.USER;
+import static org.sipfoundry.commons.mongo.MongoConstants.USER_CONS;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
@@ -30,12 +34,8 @@ import org.sipfoundry.sipxconfig.speeddial.Button;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDialManager;
 
-import static org.sipfoundry.commons.mongo.MongoConstants.BUTTONS;
-import static org.sipfoundry.commons.mongo.MongoConstants.NAME;
-import static org.sipfoundry.commons.mongo.MongoConstants.SPEEDDIAL;
-import static org.sipfoundry.commons.mongo.MongoConstants.URI;
-import static org.sipfoundry.commons.mongo.MongoConstants.USER;
-import static org.sipfoundry.commons.mongo.MongoConstants.USER_CONS;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 
 public class SpeedDials extends AbstractDataSetGenerator {
     private SpeedDialManager m_speedDialManager;
@@ -45,12 +45,16 @@ public class SpeedDials extends AbstractDataSetGenerator {
     }
 
     public boolean generate(Replicable entity, DBObject top) {
-        if (!(entity instanceof User)) {
+        SpeedDial speedDial;
+        if (entity instanceof User) {
+            User user = (User) entity;
+            speedDial = m_speedDialManager.getSpeedDialForUser(user, false);
+        } else if (entity instanceof SpeedDial) {
+            speedDial = (SpeedDial) entity;
+        } else {
             return false;
         }
-        User user = (User) entity;
         DBObject speedDialDBO = new BasicDBObject();
-        SpeedDial speedDial = m_speedDialManager.getSpeedDialForUser(user, false);
         if (speedDial != null) {
             speedDialDBO.put(USER, speedDial.getResourceListId(false));
             speedDialDBO.put(USER_CONS, speedDial.getResourceListId(true));

@@ -440,7 +440,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
     @Override
     public void replicateAllData(final DataSet ds) {
         try {
-            Long start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
             Map<String, ReplicableProvider> beanMap = m_beanFactory.getBeansOfType(ReplicableProvider.class);
             for (ReplicableProvider provider : beanMap.values()) {
                 for (Replicable entity : provider.getReplicables()) {
@@ -458,7 +458,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
             int membersCount = m_coreContext.getAllUsersCount();
             m_dataSet = ds;
             doParallelReplication(membersCount, ReplicationWorkerDataSet.class, null);
-            Long end = System.currentTimeMillis();
+            long end = System.currentTimeMillis();
             LOG.info(REGENERATION_OF + ds.getName() + " completed in " + (end - start) / 1000 + SECONDS
                     + (end - start) / 1000 / 60 + MINUTES);
 
